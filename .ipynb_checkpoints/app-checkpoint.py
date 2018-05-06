@@ -133,7 +133,7 @@ def update_graph(tickers, midia):
                 ))
                 continue
 
-            candlestick = {
+            candlestick_visu = {
                 'x': df['Data'],
                 'Visualizações': df['Visualizações'],
                 'type': 'candlestick',
@@ -142,6 +142,15 @@ def update_graph(tickers, midia):
                 'increasing': {'line': {'color': colorscale[0]}},
                 'decreasing': {'line': {'color': colorscale[1]}}
             }
+            candlestick_insc = {
+                'x': df['Data'],
+                'Isncritos': df['Inscritos'],
+                'type': 'candlestick',
+                'name': ticker,
+                'legendgroup': ticker,
+                'increasing': {'line': {'color': colorscale[0]}},
+                'decreasing': {'line': {'color': colorscale[1]}}
+            }            
             bb_bands = df['Visualizações']
             bollinger_traces = [{
                 'x': df['Data'], 'y': df['Visualizações'],
@@ -153,9 +162,30 @@ def update_graph(tickers, midia):
                 'name': '{}'.format(ticker)
             } for i, y in enumerate(bb_bands)]
             graphs.append(dcc.Graph(
-                id=ticker,
+                id='visualizações',
                 figure={
-                    'data': [candlestick] + bollinger_traces,
+                    'data': [candlestick_visu] + bollinger_traces,
+                    'layout': {
+                        'title': '{} de {}'.format(midia, ticker),
+                        'margin': {'b': 60, 'r': 10, 'l': 60, 't': 60},
+                        'legend': {'x': 0, 'y': 0}
+                    }
+                }
+            ))
+            bb_bands = df['Inscritos']
+            bollinger_traces = [{
+                'x': df['Data'], 'y': df['Inscritos'],
+                'type': 'scatter', 'mode': 'lines',
+                'line': {'width': 2.5, 'color': colorscale[(i*2) % len(colorscale)]},
+                'hoverinfo': 'none',
+                'legendgroup': ticker,
+               'showlegend': True if i == 0 else False,
+                'name': '{}'.format(ticker)
+            } for i, y in enumerate(bb_bands)]
+            graphs.append(dcc.Graph(
+                id='inscritos',
+                figure={
+                    'data': [candlestick_insc] + bollinger_traces,
                     'layout': {
                         'title': '{} de {}'.format(midia, ticker),
                         'margin': {'b': 60, 'r': 10, 'l': 60, 't': 60},
