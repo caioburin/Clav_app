@@ -51,12 +51,12 @@ app.layout = html.Div([
     dcc.RadioItems(
                 id = 'charts_radio',
                 options=[
-                    dict( label='Instagram', value='insta' ),
-                    dict( label='Youtube', value='youtube' ),
-                    dict( label='Facebook', value='face' ),
+                    dict( label='Instagram', value='Instagram' ),
+                    dict( label='Youtube', value='Youtube' ),
+                    dict( label='Facebook', value='Facebook' ),
                 ],
                 labelStyle = dict(display='inline'),
-                value='insta'
+                value='Instagram'
     ),
     
     html.Div(id='graphs')
@@ -78,7 +78,7 @@ def bbands(price, window_size=10, num_of_std=5):
 
 def update_graph(tickers, midia):
     graphs = []
-    if midia == 'insta':
+    if midia == 'Instagram':
         for i, ticker in enumerate(tickers):
             try:
                 total = pd.read_excel('/home/caio/Documentos/mbi/insta_artistas_clav.xlsx')
@@ -114,55 +114,14 @@ def update_graph(tickers, midia):
                 figure={
                     'data': [candlestick] + bollinger_traces,
                     'layout': {
-                        'margin': {'b': 0, 'r': 10, 'l': 60, 't': 0},
-                        'legend': {'x': 0}
+                        'title': '{} de {}'.format(midia, ticker),
+                        'margin': {'b': 60, 'r': 10, 'l': 60, 't': 60},
+                        'legend': {'x': 0, 'y': 0}
                     }
                 }
             ))
             
-    if midia == 'face':
-        for i, ticker in enumerate(tickers):
-            try:
-                total = pd.read_excel('/home/caio/Documentos/mbi/face_artistas_clav.xlsx')
-                df = total[total.Artista == '{}'.format(ticker)]
-            except:
-                graphs.append(html.H3(
-                    'Data is not available for {}'.format(ticker),
-                    style={'marginTop': 20, 'marginBottom': 20}
-                ))
-                continue
-
-            candlestick = {
-                'x': df['Data'],
-                'Likes': df['Likes'],
-                'type': 'candlestick',
-                'name': ticker,
-                'legendgroup': ticker,
-                'increasing': {'line': {'color': colorscale[0]}},
-                'decreasing': {'line': {'color': colorscale[1]}}
-            }
-            bb_bands = df.Likes
-            bollinger_traces = [{
-                'x': df['Data'], 'y': df['Likes'],
-                'type': 'scatter', 'mode': 'lines',
-                'line': {'width': 2.5, 'color': colorscale[(i*2) % len(colorscale)]},
-                'hoverinfo': 'none',
-                'legendgroup': ticker,
-               'showlegend': True if i == 0 else False,
-                'name': '{}'.format(ticker)
-            } for i, y in enumerate(bb_bands)]
-            graphs.append(dcc.Graph(
-                id=ticker,
-                figure={
-                    'data': [candlestick] + bollinger_traces,
-                    'layout': {
-                        'margin': {'b': 0, 'r': 10, 'l': 60, 't': 0},
-                        'legend': {'x': 0}
-                    }
-                }
-            ))
-
-    if midia == 'youtube':
+    if midia == 'Youtube':
         for i, ticker in enumerate(tickers):
             try:
                 total = pd.read_excel('/home/caio/Documentos/mbi/youtube_artistas_clav.xlsx')
@@ -198,12 +157,56 @@ def update_graph(tickers, midia):
                 figure={
                     'data': [candlestick] + bollinger_traces,
                     'layout': {
-                        'margin': {'b': 0, 'r': 10, 'l': 60, 't': 0},
-                        'legend': {'x': 0}
+                        'title': '{} de {}'.format(midia, ticker),
+                        'margin': {'b': 60, 'r': 10, 'l': 60, 't': 60},
+                        'legend': {'x': 0, 'y': 0}
                     }
                 }
-            ))            
+            ))
+            
+    if midia == 'Facebook':
+        for i, ticker in enumerate(tickers):
+            try:
+                total = pd.read_excel('/home/caio/Documentos/mbi/face_artistas_clav.xlsx')
+                df = total[total.Artista == '{}'.format(ticker)]
+            except:
+                graphs.append(html.H3(
+                    'Data is not available for {}'.format(ticker),
+                    style={'marginTop': 20, 'marginBottom': 20}
+                ))
+                continue
 
+            candlestick = {
+                'x': df['Data'],
+                'Likes': df['Likes'],
+                'type': 'candlestick',
+                'name': ticker,
+                'legendgroup': ticker,
+                'increasing': {'line': {'color': colorscale[0]}},
+                'decreasing': {'line': {'color': colorscale[1]}}
+            }
+            bb_bands = df.Likes
+            bollinger_traces = [{
+                'x': df['Data'], 'y': df['Likes'],
+                'type': 'scatter', 'mode': 'lines',
+                'line': {'width': 2.5, 'color': colorscale[(i*2) % len(colorscale)]},
+                'hoverinfo': 'none',
+                'legendgroup': ticker,
+               'showlegend': True if i == 0 else False,
+                'name': '{}'.format(ticker)
+            } for i, y in enumerate(bb_bands)]
+            graphs.append(dcc.Graph(
+                id=ticker,
+                figure={
+                    'data': [candlestick] + bollinger_traces,
+                    'layout': {
+                        'title': '{} de {}'.format(midia, ticker),
+                        'margin': {'b': 60, 'r': 10, 'l': 60, 't': 60},
+                        'legend': {'x': 0, 'y': 0}
+                    }
+                }
+            ))
+            
     return graphs
 
 
